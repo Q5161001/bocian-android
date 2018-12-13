@@ -147,10 +147,11 @@ public class AddMemberActivity extends AppCompatActivity {
             startActivity(intent);
         });
         // この画面の終了（キャンセル）
-        findViewById(R.id.addMemberActivity_bt_cancel).setOnClickListener(view -> {
+        /*findViewById(R.id.addMemberActivity_bt_cancel).setOnClickListener(view -> {
             Intent intent = new Intent(AddMemberActivity.this, MenuActivity.class);
             startActivity(intent);
-        });
+        });*/
+        findViewById(R.id.addMemberActivity_bt_cancel).setOnClickListener(view -> { finish(); });
 
         // この画面の終了（確定）
         findViewById(R.id.addMemberActivity_bt_confirm).setOnClickListener(view -> { finish(); });
