@@ -67,7 +67,8 @@
         <!--編集企業選択画面-->
         <activity
             android:name="com.websarva.wings.android.bocian.activity.SelectedCompanyActivity"
-            android:label="@string/selected_company"></activity>
+            android:label="@string/selected_company">
+        </activity>
     </application>
 
 </manifest>

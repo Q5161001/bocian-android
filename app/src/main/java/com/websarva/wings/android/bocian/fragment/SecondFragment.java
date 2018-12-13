@@ -51,7 +51,7 @@ public class SecondFragment extends Fragment {
         }
         // 自身のアクティビティ、データ、レイアウトを指定
         SelectedCompanyListAdapter adapter = new SelectedCompanyListAdapter(activity, data, R.layout.selected_company_list_item);
-        ListView listView = view.findViewById(R.id.list); // レイアウト
+        ListView listView = view.findViewById(R.id.selectedCompany_list_vi_company); // レイアウト
         listView.setAdapter(adapter);
 
         // onViewCreatedではアクセスタイミングが早すぎるため、こちらで行う

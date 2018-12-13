@@ -34,7 +34,7 @@ public class SelectedCompanyActivity extends AppCompatActivity {
         }
         // 自身のアクティビティ、データ、レイアウトを指定
         SelectedCompanyListAdapter adapter = new SelectedCompanyListAdapter(SelectedCompanyActivity.this, data, R.layout.selected_company_list_item);
-        ListView listView = findViewById(R.id.list); // レイアウト
+        ListView listView = findViewById(R.id.selectedCompany_list_vi_company); // レイアウト
         listView.setAdapter(adapter);
 
         // 企業登録画面を起動

@@ -37,7 +37,7 @@ public class FixturesActivity extends AppCompatActivity {
         }
         // 自身のアクティビティ、データ、レイアウトを指定
         FixturesListAdapter adapter = new FixturesListAdapter(FixturesActivity.this, data, R.layout.fixtures_list_item);
-        ListView listView = findViewById(R.id.list); // レイアウト
+        ListView listView = findViewById(R.id.Fixtures_list_v_fixtures); // レイアウト
         listView.setAdapter(adapter);
 
         findViewById(R.id.Fixtures_img_bt_plus).setOnClickListener(view -> {

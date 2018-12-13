@@ -40,7 +40,7 @@ public class AddCustomerActivity extends AppCompatActivity {
         }
         // 自身のアクティビティ、データ、レイアウトを指定
         AddCustomerListAdapter adapter = new AddCustomerListAdapter(AddCustomerActivity.this, data, R.layout.add_customer_list_item);
-        ListView listView = findViewById(R.id.list); // レイアウト
+        ListView listView = findViewById(R.id.addCustomer_list_vi_participant); // レイアウト
 
         listView.setAdapter(adapter);
         // 初期チェック

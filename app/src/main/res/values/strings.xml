@@ -112,27 +112,6 @@
         <item>会議室C</item>
         <item>特別会議室</item>
     </string-array>
-
-
-    <string-array name="目的">
-        <item>使用目的</item>
-        <item>重役会議</item>
-        <item>連絡会議</item>
-        <item>スケジューリング会議</item>
-        <item>アイデア出し会議</item>
-        <item>問題解決会議</item>
-        <item>問題発見会議</item>
-        <item>コーチング会議</item>
-        <item>プレゼンテーション</item>
-        <item>研修・セミナー</item>
-        <item>各種社内会議</item>
-        <item>会社説明会</item>
-        <item>筆記試験</item>
-        <item>面接</item>
-        <item>営業</item>
-        <item>打ち合わせ</item>
-    </string-array>
-
     <string-array name="hourList">
         <item>9</item>
         <item>10</item>
@@ -154,8 +133,41 @@
         <item>30</item>
         <item>45</item>
     </string-array>
-
-
+    <string-array name="社内社外">
+        <item>社内</item>
+        <item>社外</item>
+    </string-array>
+    <string-array name="num">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+    <!--DBから取り出す系-->
+    <string-array name="目的">
+        <item>使用目的</item>
+        <item>重役会議</item>
+        <item>連絡会議</item>
+        <item>スケジューリング会議</item>
+        <item>アイデア出し会議</item>
+        <item>問題解決会議</item>
+        <item>問題発見会議</item>
+        <item>コーチング会議</item>
+        <item>プレゼンテーション</item>
+        <item>研修・セミナー</item>
+        <item>各種社内会議</item>
+        <item>会社説明会</item>
+        <item>筆記試験</item>
+        <item>面接</item>
+        <item>営業</item>
+        <item>打ち合わせ</item>
+    </string-array>
     <string-array name="nameList">
         <item>赤坂 佑介</item>
         <item>尾張 佳世子</item>
@@ -259,7 +271,6 @@
         <item>第二課</item>
         <item>第三課</item>
     </string-array>
-
     <string-array name="customerNameList">
         <item>吉松 正博</item>
         <item>藁科 慶</item>
@@ -299,7 +310,6 @@
         <item>一般社員</item>
         <item>主任</item>
     </string-array>
-
     <string-array name="post">
         <item>取締役会長</item>
         <item>代表取締役</item>
@@ -311,10 +321,6 @@
         <item>主任</item>
         <item>一般社員</item>
     </string-array>
-    <string-array name="社内社外">
-        <item>社内</item>
-        <item>社外</item>
-    </string-array>
     <string-array name="companyList">
         <item>株式会社API</item>
         <item>株式会社APEX</item>
@@ -322,14 +328,6 @@
         <item>株式会社TWW</item>
         <item>日本製造株式会社</item>
         <item>日本IT株式会社</item>
-    </string-array>
-    <string-array name="countList">
-        <item>12人</item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
     </string-array>
     <string-array name="fixtures">
         <item>テーブル</item>
@@ -340,23 +338,20 @@
         <item>ホワイトボード</item>
         <item>ホワイトボードマーカー</item>
     </string-array>
+    <!--処理で計算する系-->
+    <string-array name="countList">
+        <item>12人</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
     <string-array name="fixtures2">
         <item>テーブル</item>
         <item>プロジェクター</item>
         <item>ホワイトボード</item>
         <item>ホワイトボードマーカー</item>
-    </string-array>
-    <string-array name="num">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
     </string-array>
     <string-array name="fixturesNum">
         <item>3個</item>

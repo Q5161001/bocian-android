@@ -42,11 +42,11 @@ public class EditCompanyActivity extends AppCompatActivity {
         }
         // 自身のアクティビティ、データ、レイアウトを指定
         EditCompanyListAdapter adapter = new EditCompanyListAdapter(EditCompanyActivity.this, data, R.layout.register_custmer_list_item);
-        ListView listView = findViewById(R.id.list); // レイアウト
+        ListView listView = findViewById(R.id.editCompany_list_vi_company); // レイアウト
         listView.setAdapter(adapter);
 
         // 社外者追加ダイアログの出現
-        findViewById(R.id.button8).setOnClickListener(view ->{
+        findViewById(R.id.editCompany_img_tv_plus).setOnClickListener(view ->{
             EditCompanyDialogFragment dialog = new EditCompanyDialogFragment();
             getSupportFragmentManager();
             dialog.show(getFragmentManager(), "EditCompanyDialogFragment");
