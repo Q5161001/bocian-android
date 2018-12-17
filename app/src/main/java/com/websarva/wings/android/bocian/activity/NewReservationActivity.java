@@ -50,8 +50,6 @@ public class NewReservationActivity extends AppCompatActivity {
         // この画面の終了（確定）
         findViewById(R.id.newReservation_bt_Confirm).setOnClickListener(view -> { finish(); });
 
-        BocianDBHelper helper = new BocianDBHelper(this);
-        SQLiteDatabase db = helper.getWritableDatabase();
 
     }
 }

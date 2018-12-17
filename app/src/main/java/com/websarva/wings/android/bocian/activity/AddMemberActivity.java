@@ -1,6 +1,7 @@
 package com.websarva.wings.android.bocian.activity;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,11 +16,15 @@ import android.widget.Spinner;
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.AddCompanyListAdapter;
 import com.websarva.wings.android.bocian.adapter.AddEmployeeListAdapter;
+import com.websarva.wings.android.bocian.beans.BocianDBHelper;
+import com.websarva.wings.android.bocian.data.DepartmentData;
+import com.websarva.wings.android.bocian.data.EmployeeData;
 import com.websarva.wings.android.bocian.listItem.AddCompanyListItem;
 import com.websarva.wings.android.bocian.listItem.AddEmployeeListItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 // 社外者追加画面
@@ -33,6 +38,15 @@ public class AddMemberActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_member);
 
+        // DBヘルパークラスの生成
+        BocianDBHelper helper = new BocianDBHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        List<EmployeeData> empList = helper.getEmployee(db, null, null);
+        List<DepartmentData> depList = helper.getDepartment(db, null,null);
+
+        String hoge = depList.parallelStream().filter(d -> d.getDepId() == 1).findAny().orElse(null).getDepName();
+
         // ここは繰り返しに利用しているだけ
         String names[]      = getResources().getStringArray(R.array.nameList);
         String divisions[]  = getResources().getStringArray(R.array.divisionList);
@@ -41,13 +55,12 @@ public class AddMemberActivity extends AppCompatActivity {
 
         List<AddEmployeeListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
-        for (int i = ZERO; i < names.length; i++) {
+        for (EmployeeData emp : empList) {
             AddEmployeeListItem item = new AddEmployeeListItem();
-            item.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
-            item.setName(names[i]);
-            item.setDivision(divisions[i]);
-            item.setSection(sections[i]);
-            item.setPost(posts[i]);
+            item.setId(emp.getEmpId());
+            item.setName(emp.getEmpName());
+            //item.setDivision(emp.getDepId());
+            //item.setPost(emp.getPosId());
             data.add(item); // インスタンスをリストに挿入
         }
         // ここは繰り返しに利用しているだけ

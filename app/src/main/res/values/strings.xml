@@ -340,7 +340,7 @@
     </string-array>
     <!--処理で計算する系-->
     <string-array name="countList">
-        <item>12人</item>
+        <item>6人</item>
         <item></item>
         <item></item>
         <item></item>
