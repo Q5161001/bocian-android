@@ -19,18 +19,21 @@ import com.websarva.wings.android.bocian.adapter.AddEmployeeListAdapter;
 import com.websarva.wings.android.bocian.beans.BocianDBHelper;
 import com.websarva.wings.android.bocian.data.DepartmentData;
 import com.websarva.wings.android.bocian.data.EmployeeData;
+import com.websarva.wings.android.bocian.data.PositionData;
 import com.websarva.wings.android.bocian.listItem.AddCompanyListItem;
 import com.websarva.wings.android.bocian.listItem.AddEmployeeListItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 // 社外者追加画面
 public class AddMemberActivity extends AppCompatActivity {
 
     public static final int ZERO = 0;
+    private BocianDBHelper helper;
     private boolean allCheck = false;
 
     @Override
@@ -39,28 +42,30 @@ public class AddMemberActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_member);
 
         // DBヘルパークラスの生成
-        BocianDBHelper helper = new BocianDBHelper(this);
-        SQLiteDatabase db = helper.getReadableDatabase();
+        helper = new BocianDBHelper(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
 
         List<EmployeeData> empList = helper.getEmployee(db, null, null);
         List<DepartmentData> depList = helper.getDepartment(db, null,null);
-
-        String hoge = depList.parallelStream().filter(d -> d.getDepId() == 1).findAny().orElse(null).getDepName();
-
-        // ここは繰り返しに利用しているだけ
-        String names[]      = getResources().getStringArray(R.array.nameList);
-        String divisions[]  = getResources().getStringArray(R.array.divisionList);
-        String sections[]   = getResources().getStringArray(R.array.sectionList);
-        String posts[]      = getResources().getStringArray(R.array.postList);
+        List<PositionData> posList = helper.getPosition(db, null,null);
 
         List<AddEmployeeListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
         for (EmployeeData emp : empList) {
+            // 部署名取得
+            String div  = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).map(DepartmentData::getDepName).findAny().orElse("なし");
+            // 課名取得
+            String sec  = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).map(DepartmentData::getDepName).findAny().orElse("なし");
+            // 役職名取得
+            String post  = posList.parallelStream().filter(d -> d.getPosId() == emp.getPosId()).map(PositionData::getPosName).findAny().orElse("なし");
+
             AddEmployeeListItem item = new AddEmployeeListItem();
+
             item.setId(emp.getEmpId());
             item.setName(emp.getEmpName());
-            //item.setDivision(emp.getDepId());
-            //item.setPost(emp.getPosId());
+            item.setDivision(div);
+            item.setSection(sec);
+            item.setPost(post);
             data.add(item); // インスタンスをリストに挿入
         }
         // ここは繰り返しに利用しているだけ
@@ -181,5 +186,12 @@ public class AddMemberActivity extends AppCompatActivity {
             Button btn = findViewById(R.id.addMemberActivity_bt_choice);
             btn.setText(allCheck ? "全解除" : "全選択");
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // DBもこの時にcloseされる
+        helper.close();
     }
 }

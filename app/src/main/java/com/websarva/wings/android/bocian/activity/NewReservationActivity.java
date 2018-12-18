@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.beans.BocianDBHelper;
@@ -49,7 +50,5 @@ public class NewReservationActivity extends AppCompatActivity {
 
         // この画面の終了（確定）
         findViewById(R.id.newReservation_bt_Confirm).setOnClickListener(view -> { finish(); });
-
-
     }
 }
