@@ -17,6 +17,7 @@ import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.AddCompanyListAdapter;
 import com.websarva.wings.android.bocian.adapter.AddEmployeeListAdapter;
 import com.websarva.wings.android.bocian.beans.BocianDBHelper;
+import com.websarva.wings.android.bocian.beans.Constants;
 import com.websarva.wings.android.bocian.data.CompanyData;
 import com.websarva.wings.android.bocian.data.DepartmentData;
 import com.websarva.wings.android.bocian.data.EmployeeData;
@@ -44,9 +45,9 @@ public class AddMemberActivity extends AppCompatActivity {
         SQLiteDatabase db = helper.getReadableDatabase();
 
         // 社内
-        List<EmployeeData> empList = helper.getDataList(db, getString(R.string.tableEmployee), null, null);
-        List<DepartmentData> depList = helper.getDataList(db, getString(R.string.tableDepartment),null,null);
-        List<PositionData> posList = helper.getDataList(db, getString(R.string.tablePosition),null,null);
+        List<EmployeeData> empList = helper.getDataList(db, Constants.DB.tableEmployee, null, null);
+        List<DepartmentData> depList = helper.getDataList(db, Constants.DB.tableDepartment,null,null);
+        List<PositionData> posList = helper.getDataList(db, Constants.DB.tablePosition,null,null);
 
         List<AddEmployeeListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
@@ -66,7 +67,7 @@ public class AddMemberActivity extends AppCompatActivity {
 
 
         // 会社
-        List<CompanyData> cmpList = helper.getDataList(db, getString(R.string.tableCompany), null, null);
+        List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, null, null);
 
         List<AddCompanyListItem> data2 = new ArrayList<>(); // アダプタのdata部分のリストを作成
         for (CompanyData cmp : cmpList){
