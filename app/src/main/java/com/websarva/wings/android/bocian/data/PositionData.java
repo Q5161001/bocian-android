@@ -2,12 +2,13 @@ package com.websarva.wings.android.bocian.data;
 
 import android.database.Cursor;
 
+// 役職テーブル
 public class PositionData {
     private int posId; // 役職ID
     private String posName; // 役職名
-    private String posScore; // 読み仮名
+    private int posScore; // 優先度
 
-    public PositionData(int posId, String posName, String posScore) {
+    public PositionData(int posId, String posName, int posScore) {
         this.posId = posId;
         this.posName = posName;
         this.posScore = posScore;
@@ -17,7 +18,7 @@ public class PositionData {
         /* open済みのCursorからインスタンスを生成するコンストラクタ。Cursorのcloseの責務は持たない */
         this.posId = c.getInt(offset);
         this.posName = c.getString(offset + 1);
-        this.posScore = c.getString(offset + 2);
+        this.posScore = c.getInt(offset + 2);
     }
 
     public int getPosId() {
@@ -36,11 +37,11 @@ public class PositionData {
         this.posName = posName;
     }
 
-    public String getPosScore() {
+    public int getPosScore() {
         return posScore;
     }
 
-    public void setPosScore(String posScore) {
+    public void setPosScore(int posScore) {
         this.posScore = posScore;
     }
 }

@@ -52,43 +52,28 @@ public class BocianDBHelper extends SQLiteOpenHelper {
 
     // 社員データを取得するメソッド
     // selection = 検索条件
-    public static List<EmployeeData> getEmployee(SQLiteDatabase db, String selection, String orderBy) {
 
-        String table = "Employee";
-        List<EmployeeData> list = new ArrayList<>();
+    /**
+     * @param db データベース
+     * @param table テーブル名
+     * @param selection 条件
+     * @param orderBy 順
+     * @return List<T> 指定したテーブルに対応するクラスのリスト
+     */
+    public static <T> List<T> getDataList(SQLiteDatabase db, String table, String selection, String orderBy) {
 
-        Cursor cursor = db.query(table, null, selection, null, null, null, orderBy);
 
-        // cursorオブジェクトにtry with resourcesを使うとメモリリークが発生するとか
-        try {
-            while (cursor.moveToNext()) {
-                 list.add(new EmployeeData(cursor, 0));
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                cursor.close();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return list;
-    }
-    // 社員データを取得するメソッド
-    // selection = 検索条件
-    public static List<DepartmentData> getDepartment(SQLiteDatabase db, String selection, String orderBy) {
-
-        String table = "Department";
-        List<DepartmentData> list = new ArrayList<>();
+        List<T> list = new ArrayList<>();
 
         Cursor cursor = db.query(table, null, selection, null, null, null, orderBy);
 
         // cursorオブジェクトにtry with resourcesを使うとメモリリークが発生するとか
         try {
-            while (cursor.moveToNext()) {
-                list.add(new DepartmentData(cursor, 0));
+            switch (table){
+                case "Employee":
+                    while (cursor.moveToNext()) list.add((T) (new EmployeeData(cursor, 0)));
+                case "Department":
+                    while (cursor.moveToNext()) list.add((T) (new DepartmentData(cursor, 0)));
             }
         } catch (NullPointerException e) {
             e.printStackTrace();

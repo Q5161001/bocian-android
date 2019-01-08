@@ -17,15 +17,14 @@ import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.AddCompanyListAdapter;
 import com.websarva.wings.android.bocian.adapter.AddEmployeeListAdapter;
 import com.websarva.wings.android.bocian.beans.BocianDBHelper;
+import com.websarva.wings.android.bocian.data.CompanyData;
 import com.websarva.wings.android.bocian.data.DepartmentData;
 import com.websarva.wings.android.bocian.data.EmployeeData;
 import com.websarva.wings.android.bocian.data.PositionData;
 import com.websarva.wings.android.bocian.listItem.AddCompanyListItem;
 import com.websarva.wings.android.bocian.listItem.AddEmployeeListItem;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -33,7 +32,6 @@ import java.util.Random;
 public class AddMemberActivity extends AppCompatActivity {
 
     public static final int ZERO = 0;
-    private BocianDBHelper helper;
     private boolean allCheck = false;
 
     @Override
@@ -42,47 +40,46 @@ public class AddMemberActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_member);
 
         // DBヘルパークラスの生成
-        helper = new BocianDBHelper(this);
-        SQLiteDatabase db = helper.getWritableDatabase();
+        BocianDBHelper helper = new BocianDBHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
 
-        List<EmployeeData> empList = helper.getEmployee(db, null, null);
-        List<DepartmentData> depList = helper.getDepartment(db, null,null);
-        List<PositionData> posList = helper.getPosition(db, null,null);
+        // 社内
+        List<EmployeeData> empList = helper.getDataList(db, getString(R.string.tableEmployee), null, null);
+        List<DepartmentData> depList = helper.getDataList(db, getString(R.string.tableDepartment),null,null);
+        List<PositionData> posList = helper.getDataList(db, getString(R.string.tablePosition),null,null);
 
         List<AddEmployeeListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
         for (EmployeeData emp : empList) {
-            // 部署名取得
-            String div  = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).map(DepartmentData::getDepName).findAny().orElse("なし");
-            // 課名取得
-            String sec  = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).map(DepartmentData::getDepName).findAny().orElse("なし");
-            // 役職名取得
-            String post  = posList.parallelStream().filter(d -> d.getPosId() == emp.getPosId()).map(PositionData::getPosName).findAny().orElse("なし");
+            String depName = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).findAny().map(DepartmentData::getDepName).orElse("なし");
+            String secName = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).findAny().map(DepartmentData::getDepName).orElse("なし");
+            String posName = posList.parallelStream().filter(d -> d.getPosId() == emp.getPosId()).findAny().map(PositionData::getPosName).orElse("なし");
 
             AddEmployeeListItem item = new AddEmployeeListItem();
-
             item.setId(emp.getEmpId());
             item.setName(emp.getEmpName());
-            item.setDivision(div);
-            item.setSection(sec);
-            item.setPost(post);
+            item.setDivision(depName);
+            item.setSection(secName);
+            item.setPost(posName);
             data.add(item); // インスタンスをリストに挿入
         }
-        // ここは繰り返しに利用しているだけ
-        String names2[]      = getResources().getStringArray(R.array.companyList);
-        String counts2[]       = getResources().getStringArray(R.array.countList);
+
+
+        // 会社
+        List<CompanyData> cmpList = helper.getDataList(db, getString(R.string.tableCompany), null, null);
 
         List<AddCompanyListItem> data2 = new ArrayList<>(); // アダプタのdata部分のリストを作成
-        // インスタンス生成してセットしている
-        for (int i = ZERO; i < names2.length; i++) {
+        for (CompanyData cmp : cmpList){
+
+
             AddCompanyListItem item2 = new AddCompanyListItem();
             item2.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
-            item2.setName(names2[i]);
-            item2.setCount(counts2[i]);
+            item2.setName(cmp.getCompName());
+            item2.setCount("");
             data2.add(item2); // インスタンスをリストに挿入
         }
 
-            // 自身のアクティビティ、データ、レイアウトを指定
+        // 自身のアクティビティ、データ、レイアウトを指定
         AddEmployeeListAdapter empAdapter = new AddEmployeeListAdapter(AddMemberActivity.this, data, R.layout.add_employee_list_item);
         ListView listView = findViewById(R.id.addMemberActivity_list_vi_person); // レイアウト
 
@@ -186,12 +183,5 @@ public class AddMemberActivity extends AppCompatActivity {
             Button btn = findViewById(R.id.addMemberActivity_bt_choice);
             btn.setText(allCheck ? "全解除" : "全選択");
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // DBもこの時にcloseされる
-        helper.close();
     }
 }

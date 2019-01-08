@@ -2,8 +2,9 @@ package com.websarva.wings.android.bocian.data;
 
 import android.database.Cursor;
 
+// 部署テーブル
 public class DepartmentData {
-    private int depId; // 部署ID
+    private int depId; // 部署ID（主キー）
     private String depName; // 部署名
     //private String secName; // 課名
 

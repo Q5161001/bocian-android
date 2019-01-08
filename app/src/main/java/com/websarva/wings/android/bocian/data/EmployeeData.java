@@ -4,9 +4,9 @@ import android.database.Cursor;
 
 // 社員マスタテーブル
 public class EmployeeData {
-    private int empId; // 社員ID
-    private int depId; // 部署ID
-    private int posId; // 役職ID
+    private int empId; // 社員ID（主キー）
+    private int depId; // 部署ID（外部キー）
+    private int posId; // 役職ID（外部キー）
     private String empName; // 社員名
     private String empKana; // 読み仮名
 

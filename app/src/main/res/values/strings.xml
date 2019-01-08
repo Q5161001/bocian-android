@@ -87,6 +87,14 @@
     </string-array>
 
     <!--佐竹-->
+    <!--データベーステーブル名-->
+    <string name="tableEmployee">Employee</string>
+    <string name="tableDepartment">Department</string>
+    <string name="tablePosition">Position</string>
+    <string name="tableCompany">Company</string>
+
+
+
     <string name="add_member">参加者追加画面</string>
     <string name="participant">参加者確認画面</string>
     <string name="add_fixtures">備品追加画面</string>
