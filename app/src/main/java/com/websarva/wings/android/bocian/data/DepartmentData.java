@@ -6,18 +6,20 @@ import android.database.Cursor;
 public class DepartmentData {
     private int depId; // 部署ID（主キー）
     private String depName; // 部署名
-    //private String secName; // 課名
+    private String secName; // 課名
 
 
-    public DepartmentData(int depId, String depName) {
+    public DepartmentData(int depId, String depName,String secName) {
         this.depId = depId;
         this.depName = depName;
+        this.depName = secName;
     }
 
     public DepartmentData(Cursor c, int offset) {
         /* open済みのCursorからインスタンスを生成するコンストラクタ。Cursorのcloseの責務は持たない */
         this.depId = c.getInt(offset);
         this.depName = c.getString(offset + 1);
+        this.secName = c.getString(offset + 2);
     }
 
     public int getDepId() {
@@ -35,4 +37,8 @@ public class DepartmentData {
     public void setDepName(String depName) {
         this.depName = depName;
     }
+
+    public String getSecName() { return secName; }
+
+    public void setSecName(String secName) { this.secName = secName; }
 }

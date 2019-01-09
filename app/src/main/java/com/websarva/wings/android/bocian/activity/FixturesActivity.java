@@ -6,6 +6,7 @@ import android.widget.ListView;
 
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.FixturesListAdapter;
+import com.websarva.wings.android.bocian.beans.Constants;
 import com.websarva.wings.android.bocian.fragment.AddFixturesDialogFragment;
 import com.websarva.wings.android.bocian.listItem.FixturesListItem;
 
@@ -16,7 +17,6 @@ import java.util.Random;
 // 備品確認画面
 public class FixturesActivity extends AppCompatActivity {
 
-    public static final int ZERO = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +28,7 @@ public class FixturesActivity extends AppCompatActivity {
 
         List<FixturesListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
-        for (int i = ZERO; i < names.length; i++) {
+        for (int i = Constants.Num.ZERO; i < names.length; i++) {
             FixturesListItem item = new FixturesListItem();
             item.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
             item.setName(names[i]);

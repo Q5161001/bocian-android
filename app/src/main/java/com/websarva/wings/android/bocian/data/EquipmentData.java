@@ -17,4 +17,12 @@ public class EquipmentData {
         this.eqId = c.getInt(offset);
         this.eqName = c.getString(offset + 1);
     }
+
+    public int getEqId() { return eqId; }
+
+    public void setEqId(int eqId) { this.eqId = eqId; }
+
+    public String getEqName() { return eqName; }
+
+    public void setEqName(String eqName) { this.eqName = eqName; }
 }

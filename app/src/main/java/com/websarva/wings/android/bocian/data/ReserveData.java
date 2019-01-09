@@ -45,4 +45,47 @@ public class ReserveData {
         this.remarks = c.getString(offset + 10);
     }
 
+    public int getResId() { return resId; }
+
+    public void setResId(int resId) { this.resId = resId; }
+
+    public int getResTerminalNumber() { return resTerminalNumber; }
+
+    public void setResTerminalNumber(int resTerminalNumber) { this.resTerminalNumber = resTerminalNumber; }
+
+    public int getPupId() { return pupId; }
+
+    public void setPupId(int pupId) { this.pupId = pupId; }
+
+    public int getConfRoomId() { return confRoomId; }
+
+    public void setConfRoomId(int confRoomId) { this.confRoomId = confRoomId; }
+
+    public int getRegId() { return regId; }
+
+    public void setRegId(int regId) { this.regId = regId; }
+
+    public String getUseDay() { return useDay; }
+
+    public void setUseDay(String useDay) { this.useDay = useDay; }
+
+    public String getStartTime() { return startTime; }
+
+    public void setStartTime(String startTime) { this.startTime = startTime; }
+
+    public String getEndTime() { return endTime; }
+
+    public void setEndTime(String endTime) { this.endTime = endTime; }
+
+    public int getNumExPersons() { return numExPersons; }
+
+    public void setNumExPersons(int numExPersons) { this.numExPersons = numExPersons; }
+
+    public int getFlg() { return flg; }
+
+    public void setFlg(int flg) { this.flg = flg; }
+
+    public String getRemarks() { return remarks; }
+
+    public void setRemarks(String remarks) { this.remarks = remarks; }
 }

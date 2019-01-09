@@ -24,4 +24,19 @@ public class InParticipantData {
         this.flg = c.getInt(offset + 3);
     }
 
+    public int getInParticipantId() { return InParticipantId; }
+
+    public void setInParticipantId(int inParticipantId) { InParticipantId = inParticipantId; }
+
+    public int getReserveId() { return reserveId; }
+
+    public void setReserveId(int reserveId) { this.reserveId = reserveId; }
+
+    public int getEmployeeId() { return employeeId; }
+
+    public void setEmployeeId(int employeeId) { this.employeeId = employeeId; }
+
+    public int getFlg() { return flg; }
+
+    public void setFlg(int flg) { this.flg = flg; }
 }

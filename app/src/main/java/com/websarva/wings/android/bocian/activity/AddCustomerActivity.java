@@ -9,6 +9,7 @@ import android.widget.ListView;
 
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.AddCustomerListAdapter;
+import com.websarva.wings.android.bocian.beans.Constants;
 import com.websarva.wings.android.bocian.listItem.AddCustomerListItem;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.Random;
 // 参加者追加画面（社外者）
 public class AddCustomerActivity extends AppCompatActivity {
 
-    public static final int ZERO = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class AddCustomerActivity extends AppCompatActivity {
 
         List<AddCustomerListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
-        for (int i = ZERO; i < names.length; i++) {
+        for (int i = Constants.Num.ZERO; i < names.length; i++) {
             AddCustomerListItem item = new AddCustomerListItem();
             item.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
             item.setName(names[i]);

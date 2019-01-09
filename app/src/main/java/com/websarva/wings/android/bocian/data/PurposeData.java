@@ -21,4 +21,15 @@ public class PurposeData {
         this.pupScore = c.getInt(offset + 2);
     }
 
+    public int getPupId() { return pupId; }
+
+    public void setPupId(int pupId) { this.pupId = pupId; }
+
+    public String getPupName() { return pupName; }
+
+    public void setPupName(String pupName) { this.pupName = pupName; }
+
+    public int getPupScore() { return pupScore; }
+
+    public void setPupScore(int pupScore) { this.pupScore = pupScore; }
 }

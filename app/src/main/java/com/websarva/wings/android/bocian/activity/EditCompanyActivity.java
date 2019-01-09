@@ -6,6 +6,7 @@ import android.widget.ListView;
 
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.EditCompanyListAdapter;
+import com.websarva.wings.android.bocian.beans.Constants;
 import com.websarva.wings.android.bocian.fragment.EditCompanyDialogFragment;
 import com.websarva.wings.android.bocian.listItem.EditCompanyListItem;
 
@@ -16,7 +17,6 @@ import java.util.Random;
 // 会社編集画面
 public class EditCompanyActivity extends AppCompatActivity {
 
-    public static final int ZERO = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +33,7 @@ public class EditCompanyActivity extends AppCompatActivity {
 
         List<EditCompanyListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
-        for (int i = ZERO; i < names.length; i++) {
+        for (int i = Constants.Num.ZERO; i < names.length; i++) {
             EditCompanyListItem item = new EditCompanyListItem();
             item.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
             item.setName(names[i]);

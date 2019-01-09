@@ -32,7 +32,6 @@ import java.util.Random;
 // 社外者追加画面
 public class AddMemberActivity extends AppCompatActivity {
 
-    public static final int ZERO = 0;
     private boolean allCheck = false;
 
     @Override
@@ -43,6 +42,8 @@ public class AddMemberActivity extends AppCompatActivity {
         // DBヘルパークラスの生成
         BocianDBHelper helper = new BocianDBHelper(this);
         SQLiteDatabase db = helper.getReadableDatabase();
+
+        helper.setDataList(db,null,null);
 
         // 社内
         List<EmployeeData> empList = helper.getDataList(db, Constants.DB.tableEmployee, null, null);

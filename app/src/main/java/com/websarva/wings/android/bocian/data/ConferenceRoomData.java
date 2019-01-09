@@ -19,4 +19,28 @@ public class ConferenceRoomData {
         this.confRoomName = c.getString(offset + 1);
         this.capacity = c.getInt(offset + 2);
     }
+
+    public int getConfRoomId() {
+        return confRoomId;
+    }
+
+    public void setConfRoomId(int confRoomId) {
+        this.confRoomId = confRoomId;
+    }
+
+    public String getConfRoomName() {
+        return confRoomName;
+    }
+
+    public void setConfRoomName(String confRoomName) {
+        this.confRoomName = confRoomName;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
 }

@@ -19,4 +19,16 @@ public class ExternalParticipantData {
         this.reserveId = c.getInt(offset + 1);
         this.exPersonsId = c.getInt(offset + 2);
     }
+
+    public int getExParticipantId() { return exParticipantId; }
+
+    public void setExParticipantId(int exParticipantId) { this.exParticipantId = exParticipantId; }
+
+    public int getReserveId() { return reserveId; }
+
+    public void setReserveId(int reserveId) { this.reserveId = reserveId; }
+
+    public int getExPersonsId() { return exPersonsId; }
+
+    public void setExPersonsId(int exPersonsId) { this.exPersonsId = exPersonsId; }
 }

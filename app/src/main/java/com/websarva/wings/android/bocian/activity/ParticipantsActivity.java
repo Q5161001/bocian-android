@@ -7,6 +7,7 @@ import android.widget.ListView;
 
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.ParticipantsListAdapter;
+import com.websarva.wings.android.bocian.beans.Constants;
 import com.websarva.wings.android.bocian.listItem.ParticipantsListItem;
 
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ import java.util.Random;
 // 参加者確認画面
 public class ParticipantsActivity extends AppCompatActivity {
 
-    public static final int ZERO = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -28,7 +28,7 @@ public class ParticipantsActivity extends AppCompatActivity {
 
         List<ParticipantsListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
-        for (int i = ZERO; i < names.length; i++) {
+        for (int i = Constants.Num.ZERO; i < names.length; i++) {
             ParticipantsListItem item = new ParticipantsListItem();
             item.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
             item.setName(names[i]);

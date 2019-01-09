@@ -7,6 +7,7 @@ import android.widget.ListView;
 
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.SelectedCompanyListAdapter;
+import com.websarva.wings.android.bocian.beans.Constants;
 import com.websarva.wings.android.bocian.listItem.SelectedCompanyListItem;
 
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.Random;
 
 // 編集企業選択画面
 public class SelectedCompanyActivity extends AppCompatActivity {
-    public static final int ZERO = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class SelectedCompanyActivity extends AppCompatActivity {
 
         List<SelectedCompanyListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
         // インスタンス生成してセットしている
-        for (int i = ZERO; i < names.length; i++) {
+        for (int i = Constants.Num.ZERO; i < names.length; i++) {
             SelectedCompanyListItem item = new SelectedCompanyListItem();
             item.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
             item.setName(names[i]);

@@ -12,4 +12,12 @@ public class TerminalData {
         this.terminalNumber = c.getInt(offset);
         this.empId = c.getInt(offset + 1);
     }
+
+    public int getTerminalNumber() { return terminalNumber; }
+
+    public void setTerminalNumber(int terminalNumber) { this.terminalNumber = terminalNumber; }
+
+    public int getEmpId() { return empId; }
+
+    public void setEmpId(int empId) { this.empId = empId; }
 }
