@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -37,7 +38,9 @@ import java.util.stream.Collectors;
 public class AddMemberActivity extends AppCompatActivity {
 
     private boolean allCheck = false; // 全選択状態（チェックで切り替えた場合は異なる）
-
+    private Spinner division_spinar; // 部署スピナー
+    private Spinner section_spinar; // 課スピナー
+    private AddEmployeeListAdapter empAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +49,10 @@ public class AddMemberActivity extends AppCompatActivity {
         // DBヘルパークラスの生成
         BocianDBHelper helper = new BocianDBHelper(this);
         SQLiteDatabase db = helper.getReadableDatabase();
+
+        // 初期設定
+        division_spinar = findViewById(R.id.addMemberActivity_spinar_division); // 部署スピナー
+        section_spinar = findViewById(R.id.addMemberActivity_spinar_section); // 課スピナー
 
         //helper.setDataList(db,null,null);
 
@@ -86,9 +93,8 @@ public class AddMemberActivity extends AppCompatActivity {
         }
 
         // 自身のアクティビティ、データ、レイアウトを指定
-        AddEmployeeListAdapter empAdapter = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.values().stream().findFirst().get(), R.layout.add_employee_list_item);
         ListView listView = findViewById(R.id.addMemberActivity_list_vi_person); // レイアウト
-
+        empAdapter = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.values().stream().findFirst().get(), R.layout.add_employee_list_item);
         AddCompanyListAdapter companyAdapter = new AddCompanyListAdapter(AddMemberActivity.this, addCompanyList, R.layout.company_list_item);
         listView.setAdapter(empAdapter);
 
@@ -120,7 +126,13 @@ public class AddMemberActivity extends AppCompatActivity {
                         sp.setVisibility(View.VISIBLE);
 
                         sp2.setVisibility(View.VISIBLE);
-
+                        // 鍵を取得（主キー以外の文字列2つを突き合わせているが、判別が難しいので仕方ない）
+                        Integer key =  depList.parallelStream().filter(d -> d.getDepName()
+                                .equals(division_spinar.getSelectedItem()) && d.getSecName().equals(section_spinar.getSelectedItem()))
+                                .findAny().map(d -> Integer.valueOf(d.getDepId())).orElse(new Integer(-1));
+                        // 鍵を取得（アダプターを生成）
+                        empAdapter
+                                = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.get(key), R.layout.add_employee_list_item);
                         listView.setAdapter(empAdapter);
 
                         break;
@@ -151,19 +163,61 @@ public class AddMemberActivity extends AppCompatActivity {
             }
         });
 
-        // 部署スピナーの取得
-        Spinner spinar_division = findViewById(R.id.addMemberActivity_spinar_division);
         // 部署スピナー要素の作成
         List<String> rStream = depList.parallelStream().map(DepartmentData::getDepName).distinct().collect(Collectors.toList());
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, rStream);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinar_division.setAdapter(adapter);
+        division_spinar.setAdapter(adapter);
         // リスナーの作成
-        spinar_division.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        division_spinar.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             //　アイテムが選択された時
             @Override
             public void onItemSelected(AdapterView<?> parent,
                                        View view, int position, long id) {
+                // 課スピナー要素の作成
+                List<String> rStream = depList.parallelStream().filter(d -> d.getDepName().equals(division_spinar.getSelectedItem())).map(DepartmentData::getSecName).distinct().collect(Collectors.toList());
+                ArrayAdapter adapter = new ArrayAdapter(AddMemberActivity.this, android.R.layout.simple_spinner_item, rStream);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                section_spinar.setAdapter(adapter);
+
+                // 鍵を取得（主キー以外の文字列2つを突き合わせているが、判別が難しいので仕方ない）
+                Integer key =  depList.parallelStream().filter(d -> d.getDepName()
+                        .equals(division_spinar.getSelectedItem()) && d.getSecName().equals(section_spinar.getSelectedItem()))
+                        .findAny().map(d -> Integer.valueOf(d.getDepId())).orElse(new Integer(-1));
+                // 鍵を取得（アダプターを生成）
+                if (key != -1) {
+                    empAdapter
+                            = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.get(key), R.layout.add_employee_list_item);
+                    listView.setAdapter(empAdapter);
+                }
+            }
+
+            //　アイテムが選択されなかった
+            public void onNothingSelected(AdapterView<?> parent) {
+                //
+            }
+        });
+        // 課スピナー要素の作成
+        rStream = depList.parallelStream().filter(d -> d.getDepName().equals(division_spinar.getSelectedItem())).map(DepartmentData::getSecName).distinct().collect(Collectors.toList());
+        adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, rStream);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        section_spinar.setAdapter(adapter);
+        // リスナーの作成
+        section_spinar.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            //　アイテムが選択された時
+            @Override
+            public void onItemSelected(AdapterView<?> parent,
+                                       View view, int position, long id) {
+                // 鍵を取得（主キー以外の文字列2つを突き合わせているが、判別が難しいので仕方ない）
+                Integer key =  depList.parallelStream().filter(d -> d.getDepName()
+                        .equals(division_spinar.getSelectedItem()) && d.getSecName().equals(section_spinar.getSelectedItem()))
+                        .findAny().map(d -> Integer.valueOf(d.getDepId())).orElse(new Integer(-1));
+                // 鍵を取得（アダプターを生成）
+                if (key != -1) {
+                    empAdapter
+                            = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.get(key), R.layout.add_employee_list_item);
+                    listView.setAdapter(empAdapter);
+                }
             }
 
             //　アイテムが選択されなかった

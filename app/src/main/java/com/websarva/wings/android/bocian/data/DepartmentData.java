@@ -12,7 +12,7 @@ public class DepartmentData {
     public DepartmentData(int depId, String depName,String secName) {
         this.depId = depId;
         this.depName = depName;
-        this.depName = secName;
+        this.secName = secName;
     }
 
     public DepartmentData(Cursor c, int offset) {
