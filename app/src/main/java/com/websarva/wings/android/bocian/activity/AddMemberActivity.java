@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -26,13 +27,16 @@ import com.websarva.wings.android.bocian.listItem.AddCompanyListItem;
 import com.websarva.wings.android.bocian.listItem.AddEmployeeListItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 // 社外者追加画面
 public class AddMemberActivity extends AppCompatActivity {
 
-    private boolean allCheck = false;
+    private boolean allCheck = false; // 全選択状態（チェックで切り替えた場合は異なる）
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,52 +47,52 @@ public class AddMemberActivity extends AppCompatActivity {
         BocianDBHelper helper = new BocianDBHelper(this);
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        helper.setDataList(db,null,null);
+        //helper.setDataList(db,null,null);
 
         // 社内
         List<EmployeeData> empList = helper.getDataList(db, Constants.DB.tableEmployee, null, null);
         List<DepartmentData> depList = helper.getDataList(db, Constants.DB.tableDepartment,null,null);
         List<PositionData> posList = helper.getDataList(db, Constants.DB.tablePosition,null,null);
 
-        List<AddEmployeeListItem> data = new ArrayList<>(); // アダプタのdata部分のリストを作成
-        // インスタンス生成してセットしている
+        Map<Integer ,List<AddEmployeeListItem>> addEmployeeMap = new HashMap<>(); // 全ての部署・課ごとのリストを有するmap
+        depList.forEach(t -> addEmployeeMap.put(t.getDepId() , new ArrayList<>()));
+
+        // 社員リストの作成
         for (EmployeeData emp : empList) {
             String depName = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).findAny().map(DepartmentData::getDepName).orElse("なし");
-            String secName = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).findAny().map(DepartmentData::getDepName).orElse("なし");
+            String secName = depList.parallelStream().filter(d -> d.getDepId() == emp.getDepId()).findAny().map(DepartmentData::getSecName).orElse("なし");
             String posName = posList.parallelStream().filter(d -> d.getPosId() == emp.getPosId()).findAny().map(PositionData::getPosName).orElse("なし");
 
-            AddEmployeeListItem item = new AddEmployeeListItem();
-            item.setId(emp.getEmpId());
-            item.setName(emp.getEmpName());
-            item.setDivision(depName);
-            item.setSection(secName);
-            item.setPost(posName);
-            data.add(item); // インスタンスをリストに挿入
+            AddEmployeeListItem AddEmployeeItem = new AddEmployeeListItem();
+            AddEmployeeItem.setId(emp.getEmpId());
+            AddEmployeeItem.setName(emp.getEmpName());
+            AddEmployeeItem.setDivision(depName);
+            AddEmployeeItem.setSection(secName);
+            AddEmployeeItem.setPost(posName);
+            addEmployeeMap.get(emp.getDepId()).add(AddEmployeeItem); // インスタンスを課ごとのリストに挿入
         }
 
 
         // 会社
         List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, null, null);
-
-        List<AddCompanyListItem> data2 = new ArrayList<>(); // アダプタのdata部分のリストを作成
+        // 会社リストの作成
+        List<AddCompanyListItem> addCompanyList = new ArrayList<>(); // アダプタのdata部分のリストを作成
         for (CompanyData cmp : cmpList){
-
-
-            AddCompanyListItem item2 = new AddCompanyListItem();
-            item2.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
-            item2.setName(cmp.getCompName());
-            item2.setCount("");
-            data2.add(item2); // インスタンスをリストに挿入
+            AddCompanyListItem addCompanyItem = new AddCompanyListItem();
+            addCompanyItem.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
+            addCompanyItem.setName(cmp.getCompName());
+            addCompanyItem.setCount("");
+            addCompanyList.add(addCompanyItem); // インスタンスをリストに挿入
         }
 
         // 自身のアクティビティ、データ、レイアウトを指定
-        AddEmployeeListAdapter empAdapter = new AddEmployeeListAdapter(AddMemberActivity.this, data, R.layout.add_employee_list_item);
+        AddEmployeeListAdapter empAdapter = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.values().stream().findFirst().get(), R.layout.add_employee_list_item);
         ListView listView = findViewById(R.id.addMemberActivity_list_vi_person); // レイアウト
 
-        AddCompanyListAdapter companyAdapter = new AddCompanyListAdapter(AddMemberActivity.this, data2, R.layout.company_list_item);
+        AddCompanyListAdapter companyAdapter = new AddCompanyListAdapter(AddMemberActivity.this, addCompanyList, R.layout.company_list_item);
         listView.setAdapter(empAdapter);
 
-
+        // 社内と社外の切り替え
         Spinner sp1 = findViewById(R.id.addMemberActivity_spinar_inside_outside);
         sp1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             //　アイテムが選択された時
@@ -102,7 +106,7 @@ public class AddMemberActivity extends AppCompatActivity {
                 Spinner sp2 = findViewById(R.id.addMemberActivity_spinar_section);
 
                 switch (position){
-                    case 0:
+                    case 0: // 社内
                         // 検索テキストボックスのヒントを変更
                         et.setHint("なまえ");
 
@@ -120,7 +124,7 @@ public class AddMemberActivity extends AppCompatActivity {
                         listView.setAdapter(empAdapter);
 
                         break;
-                    case 1:
+                    case 1: // 社外
                         // 検索テキストボックスのヒントを変更
                         et.setHint("企業名");
 
@@ -147,7 +151,28 @@ public class AddMemberActivity extends AppCompatActivity {
             }
         });
 
-        // クリックリスナーをセット
+        // 部署スピナーの取得
+        Spinner spinar_division = findViewById(R.id.addMemberActivity_spinar_division);
+        // 部署スピナー要素の作成
+        List<String> rStream = depList.parallelStream().map(DepartmentData::getDepName).distinct().collect(Collectors.toList());
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, rStream);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinar_division.setAdapter(adapter);
+        // リスナーの作成
+        spinar_division.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            //　アイテムが選択された時
+            @Override
+            public void onItemSelected(AdapterView<?> parent,
+                                       View view, int position, long id) {
+            }
+
+            //　アイテムが選択されなかった
+            public void onNothingSelected(AdapterView<?> parent) {
+                //
+            }
+        });
+
+        // 企業のアイテムを選択したとき
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
