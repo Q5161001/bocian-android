@@ -71,7 +71,8 @@ public class AddMemberActivity extends AppCompatActivity {
             String posName = posList.parallelStream().filter(d -> d.getPosId() == emp.getPosId()).findAny().map(PositionData::getPosName).orElse("なし");
 
             AddEmployeeListItem AddEmployeeItem = new AddEmployeeListItem();
-            AddEmployeeItem.setId(emp.getEmpId());
+            AddEmployeeItem.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
+            AddEmployeeItem.setEmpId(emp.getEmpId());
             AddEmployeeItem.setName(emp.getEmpName());
             AddEmployeeItem.setDivision(depName);
             AddEmployeeItem.setSection(secName);
@@ -87,6 +88,7 @@ public class AddMemberActivity extends AppCompatActivity {
         for (CompanyData cmp : cmpList){
             AddCompanyListItem addCompanyItem = new AddCompanyListItem();
             addCompanyItem.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
+            addCompanyItem.setCompanyId(cmp.getCompId());
             addCompanyItem.setName(cmp.getCompName());
             addCompanyItem.setCount("");
             addCompanyList.add(addCompanyItem); // インスタンスをリストに挿入
@@ -250,7 +252,16 @@ public class AddMemberActivity extends AppCompatActivity {
         findViewById(R.id.addMemberActivity_bt_cancel).setOnClickListener(view -> { finish(); });
 
         // この画面の終了（確定）
-        findViewById(R.id.addMemberActivity_bt_confirm).setOnClickListener(view -> { finish(); });
+        findViewById(R.id.addMemberActivity_bt_confirm).setOnClickListener(view -> {
+            Map<Integer ,List<Integer>> val = new HashMap<>();
+            for(Map.Entry<Integer, List<AddEmployeeListItem>> item : addEmployeeMap.entrySet()){
+                List<Integer> idList = item.getValue().parallelStream().filter(AddEmployeeListItem::isChecked).map(AddEmployeeListItem::getEmpId).collect(Collectors.toList());
+                if(idList.size() > 0) {
+                    val.put(item.getKey(), idList);
+                }
+            }
+            finish();
+        });
 
         // 全選択
         findViewById(R.id.addMemberActivity_bt_choice).setOnClickListener(view -> {
