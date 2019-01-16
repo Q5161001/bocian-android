@@ -27,4 +27,43 @@ public class ExternalPersonsData {
         this.exPersonsPosition = c.getString(offset + 4);
     }
 
+    public int getExPersonsId() {
+        return exPersonsId;
+    }
+
+    public void setExPersonsId(int exPersonsId) {
+        this.exPersonsId = exPersonsId;
+    }
+
+    public int getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
+    }
+
+    public String getExPersonsName() {
+        return exPersonsName;
+    }
+
+    public void setExPersonsName(String exPersonsName) {
+        this.exPersonsName = exPersonsName;
+    }
+
+    public String getExPersonsKana() {
+        return exPersonsKana;
+    }
+
+    public void setExPersonsKana(String exPersonsKana) {
+        this.exPersonsKana = exPersonsKana;
+    }
+
+    public String getExPersonsPosition() {
+        return exPersonsPosition;
+    }
+
+    public void setExPersonsPosition(String exPersonsPosition) {
+        this.exPersonsPosition = exPersonsPosition;
+    }
 }

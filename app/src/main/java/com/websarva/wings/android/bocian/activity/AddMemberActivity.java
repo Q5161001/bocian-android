@@ -1,8 +1,10 @@
 package com.websarva.wings.android.bocian.activity;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,16 +25,20 @@ import com.websarva.wings.android.bocian.beans.Constants;
 import com.websarva.wings.android.bocian.data.CompanyData;
 import com.websarva.wings.android.bocian.data.DepartmentData;
 import com.websarva.wings.android.bocian.data.EmployeeData;
+import com.websarva.wings.android.bocian.data.ExternalPersonsData;
 import com.websarva.wings.android.bocian.data.PositionData;
 import com.websarva.wings.android.bocian.listItem.AddCompanyListItem;
 import com.websarva.wings.android.bocian.listItem.AddEmployeeListItem;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import static com.websarva.wings.android.bocian.beans.Constants.Num.*;
 
 // 社外者追加画面
 public class AddMemberActivity extends AppCompatActivity {
@@ -41,6 +47,9 @@ public class AddMemberActivity extends AppCompatActivity {
     private Spinner division_spinar; // 部署スピナー
     private Spinner section_spinar; // 課スピナー
     private AddEmployeeListAdapter empAdapter;
+    private HashMap<Integer ,List<Integer>> externalParticipantMap; // ほかの画面に受け渡す社外参加者ID
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +71,7 @@ public class AddMemberActivity extends AppCompatActivity {
         List<PositionData> posList = helper.getDataList(db, Constants.DB.tablePosition,null,null);
 
         Map<Integer ,List<AddEmployeeListItem>> addEmployeeMap = new HashMap<>(); // 全ての部署・課ごとのリストを有するmap
-        depList.forEach(t -> addEmployeeMap.put(t.getDepId() , new ArrayList<>()));
+        depList.forEach(t -> addEmployeeMap.put(t.getDepId() , new ArrayList<>())); // 鍵 -> 部署ID データ -> AddEmployeeListItemインスタンス
 
         // 社員リストの作成
         for (EmployeeData emp : empList) {
@@ -83,6 +92,8 @@ public class AddMemberActivity extends AppCompatActivity {
 
         // 会社
         List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, null, null);
+        externalParticipantMap = new HashMap<>(); // 全ての部署・課ごとのリストを有するmap
+        cmpList.forEach(t -> externalParticipantMap.put(t.getCompId() , new ArrayList<>())); // 鍵 -> 会社ID    データ -> ExternalPersonsDataインスタンス
         // 会社リストの作成
         List<AddCompanyListItem> addCompanyList = new ArrayList<>(); // アダプタのdata部分のリストを作成
         for (CompanyData cmp : cmpList){
@@ -90,7 +101,7 @@ public class AddMemberActivity extends AppCompatActivity {
             addCompanyItem.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
             addCompanyItem.setCompanyId(cmp.getCompId());
             addCompanyItem.setName(cmp.getCompName());
-            addCompanyItem.setCount("");
+            addCompanyItem.setCount(""); // 予約画面から値が渡されてきていればセットする処理
             addCompanyList.add(addCompanyItem); // インスタンスをリストに挿入
         }
 
@@ -213,9 +224,9 @@ public class AddMemberActivity extends AppCompatActivity {
                 // 鍵を取得（主キー以外の文字列2つを突き合わせているが、判別が難しいので仕方ない）
                 Integer key =  depList.parallelStream().filter(d -> d.getDepName()
                         .equals(division_spinar.getSelectedItem()) && d.getSecName().equals(section_spinar.getSelectedItem()))
-                        .findAny().map(d -> Integer.valueOf(d.getDepId())).orElse(new Integer(-1));
+                        .findAny().map(d -> Integer.valueOf(d.getDepId())).orElse(new Integer(_ONE));
                 // 鍵を取得（アダプターを生成）
-                if (key != -1) {
+                if (key != _ONE) {
                     empAdapter
                             = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.get(key), R.layout.add_employee_list_item);
                     listView.setAdapter(empAdapter);
@@ -235,6 +246,7 @@ public class AddMemberActivity extends AppCompatActivity {
                 // 企業が表示されているときに限定する
                 if (listView.getAdapter().equals(companyAdapter)) {
                     Intent intent = new Intent(AddMemberActivity.this, AddCustomerActivity.class);
+                    intent.putExtra("会社ID" , addCompanyList.get(position).getCompanyId());
                     startActivity(intent);
                 }
             }
@@ -253,19 +265,23 @@ public class AddMemberActivity extends AppCompatActivity {
 
         // この画面の終了（確定）
         findViewById(R.id.addMemberActivity_bt_confirm).setOnClickListener(view -> {
-            Map<Integer ,List<Integer>> val = new HashMap<>();
+            Intent intent = new Intent();
+
+            // 参加者リストの作成（社内）
+            HashMap<Integer ,List<Integer>> inParticipant = new HashMap<>();
             for(Map.Entry<Integer, List<AddEmployeeListItem>> item : addEmployeeMap.entrySet()){
                 List<Integer> idList = item.getValue().parallelStream().filter(AddEmployeeListItem::isChecked).map(AddEmployeeListItem::getEmpId).collect(Collectors.toList());
-                if(idList.size() > 0) {
-                    val.put(item.getKey(), idList);
-                }
+                if(idList.size() > ZERO) inParticipant.put(item.getKey(), idList);
             }
+            intent.putExtra("社内参加者リスト", inParticipant);
+            intent.putExtra("社外参加者リスト", externalParticipantMap);
+            setResult(RESULT_OK, intent);
             finish();
         });
 
         // 全選択
         findViewById(R.id.addMemberActivity_bt_choice).setOnClickListener(view -> {
-            for (int i = 0; i < empAdapter.getCount(); i++) {
+            for (int i = ZERO; i < empAdapter.getCount(); i++) {
                 View c_listView = empAdapter.getView(i, null, null);
                 CheckBox check = (CheckBox) c_listView.findViewById(R.id.checkbox);
                 check.setChecked(!allCheck); // 反転させる
@@ -275,5 +291,22 @@ public class AddMemberActivity extends AppCompatActivity {
             Button btn = findViewById(R.id.addMemberActivity_bt_choice);
             btn.setText(allCheck ? "全解除" : "全選択");
         });
+    }
+
+    // startActivityForResult で起動させたアクティビティが
+    // finish() により破棄されたときにコールされる
+    // requestCode : startActivityForResult の第二引数で指定した値が渡される
+    // resultCode : 起動先のActivity.setResult の第一引数が渡される
+    // Intent intent : 起動先Activityから送られてくる Intent
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        int cmpId = intent.getIntExtra("会社ID", _ONE);
+        if (cmpId != _ONE){
+            ArrayList<Integer> epIdList = (ArrayList<Integer>) intent.getSerializableExtra("社外参加者リスト");
+
+            List<Integer> epList = externalParticipantMap.get(cmpId);
+            epIdList.parallelStream().forEach(epList::add);
+        }
     }
 }

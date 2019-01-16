@@ -14,6 +14,7 @@ import com.websarva.wings.android.bocian.data.DepartmentData;
 import com.websarva.wings.android.bocian.data.EmployeeData;
 import com.websarva.wings.android.bocian.data.EquipmentData;
 import com.websarva.wings.android.bocian.data.ExternalParticipantData;
+import com.websarva.wings.android.bocian.data.ExternalPersonsData;
 import com.websarva.wings.android.bocian.data.InParticipantData;
 import com.websarva.wings.android.bocian.data.PositionData;
 import com.websarva.wings.android.bocian.data.PurposeData;
@@ -239,6 +240,20 @@ public class BocianDBHelper extends SQLiteOpenHelper {
                 stmt.bindLong(ONE, ((ExternalParticipantData) data).getExParticipantId());
                 stmt.bindLong(TWO, ((ExternalParticipantData) data).getReserveId());
                 stmt.bindLong(THREE, ((ExternalParticipantData) data).getExPersonsId());
+                // SQLの実行
+                stmt.execute();
+                break;
+            case Constants.DB.tableExternalPersons:
+                // SQLの作成
+                sql = "replace into ExternalPersons(exPersonsId, companyId, exPersonsName, exPersonsKana, exPersonsPosition) values(?, ?, ?, ?, ?)";
+                // SQL文字列をもとにプリペアドステートメントを取得
+                stmt = db.compileStatement(sql);
+                // 変数のバインド
+                stmt.bindLong(ONE, ((ExternalPersonsData) data).getExPersonsId());
+                stmt.bindLong(TWO, ((ExternalPersonsData) data).getCompanyId());
+                stmt.bindString(THREE, ((ExternalPersonsData) data).getExPersonsName());
+                stmt.bindString(FOUR, ((ExternalPersonsData) data).getExPersonsKana());
+                stmt.bindString(FIVE, ((ExternalPersonsData) data).getExPersonsPosition());
                 // SQLの実行
                 stmt.execute();
                 break;

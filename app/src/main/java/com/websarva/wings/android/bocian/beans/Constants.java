@@ -19,6 +19,7 @@ public final class Constants {
         public static final String tableEmployee = "Employee";
         public static final String tableEquipment = "Equipment";
         public static final String tableExternalParticipant = "ExternalParticipant";
+        public static final String tableExternalPersons = "ExternalPersons";
         public static final String tableInParticipant = "InParticipant";
         public static final String tablePosition = "Position";
         public static final String tablePurpose = "Purpose";
@@ -29,6 +30,7 @@ public final class Constants {
     }
     // 数字
     public final class Num {
+        public static final int _ONE = -1;
         public static final int ZERO = 0;
         public static final int ONE = 1;
         public static final int TWO = 2;

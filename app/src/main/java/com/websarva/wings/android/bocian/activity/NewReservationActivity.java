@@ -9,10 +9,20 @@ import android.util.Log;
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.beans.BocianDBHelper;
 import com.websarva.wings.android.bocian.fragment.AddFixturesDialogFragment;
+import com.websarva.wings.android.bocian.listItem.AddEmployeeListItem;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.websarva.wings.android.bocian.beans.Constants.Num.ZERO;
 
 // 新規予約画面
 public class NewReservationActivity extends AppCompatActivity {
-
+    private ArrayList<Integer> empIdList; // 社内参加者リスト
+    private ArrayList<Integer> epIdList;  // 社外参加者リスト
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,5 +60,17 @@ public class NewReservationActivity extends AppCompatActivity {
 
         // この画面の終了（確定）
         findViewById(R.id.newReservation_bt_Confirm).setOnClickListener(view -> { finish(); });
+    }
+
+    // startActivityForResult で起動させたアクティビティが
+    // finish() により破棄されたときにコールされる
+    // requestCode : startActivityForResult の第二引数で指定した値が渡される
+    // resultCode : 起動先のActivity.setResult の第一引数が渡される
+    // Intent intent : 起動先Activityから送られてくる Intent
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        ArrayList<Integer> hoge = (ArrayList<Integer>) intent.getSerializableExtra("社内参加者リスト");
+        ArrayList<Integer> huga = (ArrayList<Integer>) intent.getSerializableExtra("社外参加者リスト");
     }
 }
