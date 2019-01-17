@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
@@ -46,10 +47,11 @@ public class AddCustomerActivity extends AppCompatActivity {
 
 
         // 会社
-        List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, "WHERE compId = " + cmpId, null);
+        List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, "compId=?", new String[]{Integer.toString(cmpId)}, null);
 
         // 社外者リストの作成
-        List<ExternalPersonsData> epList = helper.getDataList(db, Constants.DB.tableExternalParticipant, "WHERE compId = " + cmpId, null);
+        List<ExternalPersonsData> epList = helper.getDataList(db, Constants.DB.tableExternalPersons, "companyId=?", new String[]{Integer.toString(cmpId)}, null);
+
         List<AddCustomerListItem> addCustomerList = new ArrayList<>(); // アダプタのdata部分のリストを作成
         for (ExternalPersonsData ep : epList){
             AddCustomerListItem item = new AddCustomerListItem();
@@ -58,7 +60,11 @@ public class AddCustomerActivity extends AppCompatActivity {
             item.setName(ep.getExPersonsName());
             item.setPost(ep.getExPersonsPosition());
             addCustomerList.add(item); // インスタンスをリストに挿入
+            Log.d("hoge","hogemaster");
         }
+        Log.d("hoge",String.valueOf(cmpList.size()));
+        Log.d("hoge",String.valueOf(epList.size()));
+        Log.d("hoge",String.valueOf(cmpId));
 
         // 自身のアクティビティ、データ、レイアウトを指定
         AddCustomerListAdapter adapter = new AddCustomerListAdapter(AddCustomerActivity.this, addCustomerList, R.layout.add_customer_list_item);
@@ -84,6 +90,7 @@ public class AddCustomerActivity extends AppCompatActivity {
         findViewById(R.id.addCustomer_bt_confirm).setOnClickListener(view -> {
             Intent intent = new Intent();
             ArrayList<Integer> epIdList = addCustomerList.parallelStream().filter(AddCustomerListItem::isChecked).map(AddCustomerListItem::getCustomerId).collect(Collectors.toCollection(ArrayList::new));
+            Log.d("eee", String.valueOf(epIdList.size()));
             intent.putExtra("社外参加者リスト", epIdList);
             intent.putExtra("会社ID", cmpId);
             setResult(RESULT_OK, intent);

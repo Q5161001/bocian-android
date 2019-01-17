@@ -72,10 +72,10 @@ public class BocianDBHelper extends SQLiteOpenHelper {
      * @param orderBy 順
      * @return list<T> 指定したテーブルに対応するクラスのリスト
      */
-    public static <T> List<T> getDataList(SQLiteDatabase db, String table, String selection, String orderBy) {
+    public static <T> List<T> getDataList(SQLiteDatabase db, String table, String selection, String[] args, String orderBy) {
         List<T> list = new ArrayList<>();
 
-        Cursor cursor = db.query(table, null, selection, null, null, null, orderBy);
+        Cursor cursor = db.query(table, null, selection, args, null, null, orderBy);
 
         // cursorオブジェクトにtry with resourcesを使うとメモリリークが発生するとか
         try {
@@ -100,6 +100,9 @@ public class BocianDBHelper extends SQLiteOpenHelper {
                     break;
                 case Constants.DB.tableEquipment:
                     while (cursor.moveToNext()) list.add((T) (new EquipmentData(cursor, ZERO)));
+                    break;
+                case Constants.DB.tableExternalPersons:
+                    while (cursor.moveToNext()) list.add((T) (new ExternalPersonsData(cursor, ZERO)));
                     break;
                 case Constants.DB.tableExternalParticipant:
                     while (cursor.moveToNext()) list.add((T) (new ExternalParticipantData(cursor, ZERO)));

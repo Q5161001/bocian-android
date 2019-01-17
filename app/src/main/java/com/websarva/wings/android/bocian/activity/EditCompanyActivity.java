@@ -43,10 +43,10 @@ public class EditCompanyActivity extends AppCompatActivity {
             //TextView button = findViewById(R.id.button4);
 
             // 会社
-            List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, "WHERE compId = " + cmpId, null);
+            List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, "compId = ?" , new String[]{Integer.toString(cmpId)}, null);
 
             // 社外者リストの作成
-            List<ExternalPersonsData> epList = helper.getDataList(db, Constants.DB.tableExternalParticipant, "WHERE compId = " + cmpId, null);
+            List<ExternalPersonsData> epList = helper.getDataList(db, Constants.DB.tableExternalPersons, "companyId = ?", new String[]{Integer.toString(cmpId)}, null);
         }
         // ここは繰り返しに利用しているだけ
         String names[]      = getResources().getStringArray(R.array.customerNameList);

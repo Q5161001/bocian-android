@@ -1,5 +1,6 @@
 package com.websarva.wings.android.bocian.activity;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.AddCompanyListAdapter;
@@ -30,7 +32,10 @@ import com.websarva.wings.android.bocian.data.PositionData;
 import com.websarva.wings.android.bocian.listItem.AddCompanyListItem;
 import com.websarva.wings.android.bocian.listItem.AddEmployeeListItem;
 
+import org.w3c.dom.Text;
+
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,9 +52,11 @@ public class AddMemberActivity extends AppCompatActivity {
     private Spinner division_spinar; // 部署スピナー
     private Spinner section_spinar; // 課スピナー
     private AddEmployeeListAdapter empAdapter;
+    private HashMap<Integer ,List<AddEmployeeListItem>> addEmployeeMap; // 全ての部署・課ごとのリストを有するmap
     private HashMap<Integer ,List<Integer>> externalParticipantMap; // ほかの画面に受け渡す社外参加者ID
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,11 +73,11 @@ public class AddMemberActivity extends AppCompatActivity {
         //helper.setDataList(db,null,null);
 
         // 社内
-        List<EmployeeData> empList = helper.getDataList(db, Constants.DB.tableEmployee, null, null);
-        List<DepartmentData> depList = helper.getDataList(db, Constants.DB.tableDepartment,null,null);
-        List<PositionData> posList = helper.getDataList(db, Constants.DB.tablePosition,null,null);
+        List<EmployeeData> empList = helper.getDataList(db, Constants.DB.tableEmployee, null,null, null);
+        List<DepartmentData> depList = helper.getDataList(db, Constants.DB.tableDepartment,null,null,null);
+        List<PositionData> posList = helper.getDataList(db, Constants.DB.tablePosition,null,null,null);
 
-        Map<Integer ,List<AddEmployeeListItem>> addEmployeeMap = new HashMap<>(); // 全ての部署・課ごとのリストを有するmap
+        addEmployeeMap = new HashMap<>(); // 全ての部署・課ごとのリストを有するmap
         depList.forEach(t -> addEmployeeMap.put(t.getDepId() , new ArrayList<>())); // 鍵 -> 部署ID データ -> AddEmployeeListItemインスタンス
 
         // 社員リストの作成
@@ -91,7 +98,7 @@ public class AddMemberActivity extends AppCompatActivity {
 
 
         // 会社
-        List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, null, null);
+        List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, null, null,null);
         externalParticipantMap = new HashMap<>(); // 全ての部署・課ごとのリストを有するmap
         cmpList.forEach(t -> externalParticipantMap.put(t.getCompId() , new ArrayList<>())); // 鍵 -> 会社ID    データ -> ExternalPersonsDataインスタンス
         // 会社リストの作成
@@ -105,7 +112,8 @@ public class AddMemberActivity extends AppCompatActivity {
             addCompanyList.add(addCompanyItem); // インスタンスをリストに挿入
         }
 
-        // 自身のアクティビティ、データ、レイアウトを指定
+
+        // 初期リスト・アダプタの設定
         ListView listView = findViewById(R.id.addMemberActivity_list_vi_person); // レイアウト
         empAdapter = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.values().stream().findFirst().get(), R.layout.add_employee_list_item);
         AddCompanyListAdapter companyAdapter = new AddCompanyListAdapter(AddMemberActivity.this, addCompanyList, R.layout.company_list_item);
@@ -247,7 +255,7 @@ public class AddMemberActivity extends AppCompatActivity {
                 if (listView.getAdapter().equals(companyAdapter)) {
                     Intent intent = new Intent(AddMemberActivity.this, AddCustomerActivity.class);
                     intent.putExtra("会社ID" , addCompanyList.get(position).getCompanyId());
-                    startActivity(intent);
+                    startActivityForResult(intent, ZERO);
                 }
             }
         });
@@ -302,11 +310,19 @@ public class AddMemberActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         int cmpId = intent.getIntExtra("会社ID", _ONE);
+        Log.d("eee", "会社ID" + Long.toString(cmpId));
+
         if (cmpId != _ONE){
             ArrayList<Integer> epIdList = (ArrayList<Integer>) intent.getSerializableExtra("社外参加者リスト");
 
             List<Integer> epList = externalParticipantMap.get(cmpId);
-            epIdList.parallelStream().forEach(epList::add);
+            epList = epIdList;
+            Log.d("eee", "所属人数" + epList.size() + "人");
+
+            TextView text = findViewById(R.id.addMemberActivity_tv_choice);
+            text.setText( + externalParticipantMap.values().parallelStream().mapToInt(List::size).sum() + "人選択中");
+            long a = addEmployeeMap.values().parallelStream().mapToLong(t-> t.parallelStream().filter(AddEmployeeListItem::isChecked).count()).sum();
+            Log.d("eee", a + "人選択中");
         }
     }
 }
