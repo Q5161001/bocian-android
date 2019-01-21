@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.websarva.wings.android.bocian.R;
 import com.websarva.wings.android.bocian.adapter.AddCustomerListAdapter;
@@ -19,6 +20,7 @@ import com.websarva.wings.android.bocian.data.ExternalParticipantData;
 import com.websarva.wings.android.bocian.data.ExternalPersonsData;
 import com.websarva.wings.android.bocian.listItem.AddCompanyListItem;
 import com.websarva.wings.android.bocian.listItem.AddCustomerListItem;
+import com.websarva.wings.android.bocian.listItem.AddEmployeeListItem;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,13 +43,12 @@ public class AddCustomerActivity extends AppCompatActivity {
         BocianDBHelper helper = new BocianDBHelper(this);
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        // 前画面からデータの受け取り
         setContentView(R.layout.activity_add_customer);
-        int cmpId = getIntent().getIntExtra("会社ID", -1);
-
-
+        // 前画面からデータの受け取り
+        int cmpId = getIntent().getIntExtra("会社ID", _ONE);
+        ArrayList<Integer> idList = (ArrayList<Integer>) getIntent().getSerializableExtra("参加者リスト");
         // 会社
-        List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, "compId=?", new String[]{Integer.toString(cmpId)}, null);
+        // List<CompanyData> cmpList = helper.getDataList(db, Constants.DB.tableCompany, "compId=?", new String[]{Integer.toString(cmpId)}, null);
 
         // 社外者リストの作成
         List<ExternalPersonsData> epList = helper.getDataList(db, Constants.DB.tableExternalPersons, "companyId=?", new String[]{Integer.toString(cmpId)}, null);
@@ -59,12 +60,9 @@ public class AddCustomerActivity extends AppCompatActivity {
             item.setCustomerId(ep.getExPersonsId());
             item.setName(ep.getExPersonsName());
             item.setPost(ep.getExPersonsPosition());
+            if (idList.contains(item.getCustomerId())) item.setChecked(true); // すでに入っているならチェックする
             addCustomerList.add(item); // インスタンスをリストに挿入
-            Log.d("hoge","hogemaster");
         }
-        Log.d("hoge",String.valueOf(cmpList.size()));
-        Log.d("hoge",String.valueOf(epList.size()));
-        Log.d("hoge",String.valueOf(cmpId));
 
         // 自身のアクティビティ、データ、レイアウトを指定
         AddCustomerListAdapter adapter = new AddCustomerListAdapter(AddCustomerActivity.this, addCustomerList, R.layout.add_customer_list_item);
@@ -72,18 +70,29 @@ public class AddCustomerActivity extends AppCompatActivity {
 
         listView.setAdapter(adapter);
         // 初期チェック
-        for (int i = ZERO; i < listView.getCount(); i += 2) {
+        /*for (int i = ZERO; i < listView.getCount(); i += 2) {
             View c_listView = adapter.getView(i, null, null);
             CheckBox check = (CheckBox) c_listView.findViewById(R.id.checkbox);
             check.setChecked(true);
-        }
+        }*/
+
+        // 会社参加人数の表示を更新
+        TextView text = findViewById(R.id.addCustomer_tv_selecting);
+        text.setText(addCustomerList.parallelStream().filter(AddCustomerListItem::isChecked).count() + "人選択中");
+
+        // リストのアイテムを選択したとき
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            // 現在の参加者人数の表示を更新
+            switch (view.getId()){
+                case R.id.checkbox:
+                    text.setText(addCustomerList.parallelStream().filter(AddCustomerListItem::isChecked).count() + "人選択中");
+            }
+        });
         // リスナー
         // 企業登録画面の起動
         findViewById(R.id.addCustomer_img_bt_add_to).setOnClickListener(view -> {
             Intent intent = new Intent(AddCustomerActivity.this, EditCompanyActivity.class);
-
             intent.putExtra("会社ID", cmpId);
-
             startActivity(intent);
         });
         // この画面の終了（確定）

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.websarva.wings.android.bocian.R;
@@ -52,6 +53,8 @@ public class AddCompanyListAdapter extends BaseAdapter {    // 自作のadapter�
         }
         ((TextView)convertView.findViewById(R.id.name)).setText(item.getName());
         ((TextView)convertView.findViewById(R.id.count)).setText(item.getCount());
+        TextView count = convertView.findViewById(R.id.count);
+        count.setOnClickListener(v -> ((ListView) parent).performItemClick(v, position, R.id.count));
         return convertView;
     }
 }

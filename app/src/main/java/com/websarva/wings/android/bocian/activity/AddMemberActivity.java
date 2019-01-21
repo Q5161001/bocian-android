@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -52,11 +53,12 @@ public class AddMemberActivity extends AppCompatActivity {
     private Spinner division_spinar; // 部署スピナー
     private Spinner section_spinar; // 課スピナー
     private AddEmployeeListAdapter empAdapter;
-    private HashMap<Integer ,List<AddEmployeeListItem>> addEmployeeMap; // 全ての部署・課ごとのリストを有するmap
-    private HashMap<Integer ,List<Integer>> externalParticipantMap; // ほかの画面に受け渡す社外参加者ID
+    private AddCompanyListAdapter companyAdapter;
+    private HashMap<Integer ,ArrayList<AddEmployeeListItem>> addEmployeeMap; // 全ての部署・課ごとのリストを有するmap
+    private HashMap<Integer ,ArrayList<Integer>> externalParticipantMap; // ほかの画面に受け渡す社外参加者ID
+    private List<AddCompanyListItem>  addCompanyList; // 会社リスト
 
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +104,7 @@ public class AddMemberActivity extends AppCompatActivity {
         externalParticipantMap = new HashMap<>(); // 全ての部署・課ごとのリストを有するmap
         cmpList.forEach(t -> externalParticipantMap.put(t.getCompId() , new ArrayList<>())); // 鍵 -> 会社ID    データ -> ExternalPersonsDataインスタンス
         // 会社リストの作成
-        List<AddCompanyListItem> addCompanyList = new ArrayList<>(); // アダプタのdata部分のリストを作成
+        addCompanyList = new ArrayList<>(); // アダプタのdata部分のリストを作成
         for (CompanyData cmp : cmpList){
             AddCompanyListItem addCompanyItem = new AddCompanyListItem();
             addCompanyItem.setId((new Random()).nextLong());  // 別に乱数にしなくてもよい
@@ -116,7 +118,7 @@ public class AddMemberActivity extends AppCompatActivity {
         // 初期リスト・アダプタの設定
         ListView listView = findViewById(R.id.addMemberActivity_list_vi_person); // レイアウト
         empAdapter = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.values().stream().findFirst().get(), R.layout.add_employee_list_item);
-        AddCompanyListAdapter companyAdapter = new AddCompanyListAdapter(AddMemberActivity.this, addCompanyList, R.layout.company_list_item);
+        companyAdapter = new AddCompanyListAdapter(AddMemberActivity.this, addCompanyList, R.layout.company_list_item);
         listView.setAdapter(empAdapter);
 
         // 社内と社外の切り替え
@@ -133,7 +135,7 @@ public class AddMemberActivity extends AppCompatActivity {
                 Spinner sp2 = findViewById(R.id.addMemberActivity_spinar_section);
 
                 switch (position){
-                    case 0: // 社内
+                    case ZERO: // 社内
                         // 検索テキストボックスのヒントを変更
                         et.setHint("なまえ");
 
@@ -157,7 +159,7 @@ public class AddMemberActivity extends AppCompatActivity {
                         listView.setAdapter(empAdapter);
 
                         break;
-                    case 1: // 社外
+                    case ONE: // 社外
                         // 検索テキストボックスのヒントを変更
                         et.setHint("企業名");
 
@@ -206,7 +208,7 @@ public class AddMemberActivity extends AppCompatActivity {
                         .equals(division_spinar.getSelectedItem()) && d.getSecName().equals(section_spinar.getSelectedItem()))
                         .findAny().map(d -> Integer.valueOf(d.getDepId())).orElse(new Integer(-1));
                 // 鍵を取得（アダプターを生成）
-                if (key != -1) {
+                if (key != _ONE) {
                     empAdapter
                             = new AddEmployeeListAdapter(AddMemberActivity.this, addEmployeeMap.get(key), R.layout.add_employee_list_item);
                     listView.setAdapter(empAdapter);
@@ -247,15 +249,23 @@ public class AddMemberActivity extends AppCompatActivity {
             }
         });
 
-        // 企業のアイテムを選択したとき
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // 企業が表示されているときに限定する
-                if (listView.getAdapter().equals(companyAdapter)) {
-                    Intent intent = new Intent(AddMemberActivity.this, AddCustomerActivity.class);
-                    intent.putExtra("会社ID" , addCompanyList.get(position).getCompanyId());
-                    startActivityForResult(intent, ZERO);
+        // 社外のアイテムを選択したとき
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            // 企業が表示されているときに限定する
+            if (listView.getAdapter().equals(companyAdapter)) {
+                Intent intent = new Intent(AddMemberActivity.this, AddCustomerActivity.class);
+                int cmpId = addCompanyList.get(position).getCompanyId();
+                intent.putExtra("会社ID" , cmpId);
+                intent.putExtra("参加者リスト" , externalParticipantMap.get(cmpId));
+                startActivityForResult(intent, ZERO);
+            }else{
+                // 社内のアイテムを選択したとき
+                // 現在の参加者人数の表示を更新
+                switch (view.getId()){
+                    case R.id.checkbox:
+                        TextView text = findViewById(R.id.addMemberActivity_tv_choice);
+                        text.setText(externalParticipantMap.values().parallelStream().mapToInt(List::size).sum() +
+                                addEmployeeMap.values().parallelStream().mapToLong(t -> t.parallelStream().filter(AddEmployeeListItem::isChecked).count()).sum() + "人選択中");
                 }
             }
         });
@@ -277,7 +287,7 @@ public class AddMemberActivity extends AppCompatActivity {
 
             // 参加者リストの作成（社内）
             HashMap<Integer ,List<Integer>> inParticipant = new HashMap<>();
-            for(Map.Entry<Integer, List<AddEmployeeListItem>> item : addEmployeeMap.entrySet()){
+            for(Map.Entry<Integer, ArrayList<AddEmployeeListItem>> item : addEmployeeMap.entrySet()){
                 List<Integer> idList = item.getValue().parallelStream().filter(AddEmployeeListItem::isChecked).map(AddEmployeeListItem::getEmpId).collect(Collectors.toList());
                 if(idList.size() > ZERO) inParticipant.put(item.getKey(), idList);
             }
@@ -315,14 +325,17 @@ public class AddMemberActivity extends AppCompatActivity {
         if (cmpId != _ONE){
             ArrayList<Integer> epIdList = (ArrayList<Integer>) intent.getSerializableExtra("社外参加者リスト");
 
-            List<Integer> epList = externalParticipantMap.get(cmpId);
-            epList = epIdList;
-            Log.d("eee", "所属人数" + epList.size() + "人");
+            externalParticipantMap.put(cmpId, epIdList);
 
+            // 現在の参加者人数の表示を更新
             TextView text = findViewById(R.id.addMemberActivity_tv_choice);
-            text.setText( + externalParticipantMap.values().parallelStream().mapToInt(List::size).sum() + "人選択中");
-            long a = addEmployeeMap.values().parallelStream().mapToLong(t-> t.parallelStream().filter(AddEmployeeListItem::isChecked).count()).sum();
-            Log.d("eee", a + "人選択中");
+            text.setText(externalParticipantMap.values().parallelStream().mapToInt(List::size).sum() +
+                    addEmployeeMap.values().parallelStream().mapToLong(t -> t.parallelStream().filter(AddEmployeeListItem::isChecked).count()).sum() + "人選択中");
+            // 会社参加人数の表示を更新
+            AddCompanyListItem CompanyItem = addCompanyList.parallelStream().filter(t -> t.getCompanyId() == cmpId).findAny().orElse( new AddCompanyListItem());
+            CompanyItem.setCount(epIdList.size() + "人");
+            // アダプタの更新
+            companyAdapter.notifyDataSetChanged();
         }
     }
 }
